@@ -69,7 +69,7 @@ module.exports = {
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/angular-ui-utils/modules/route/route.js',
       'vendor/underscore/underscore.js',
-      'vendor/skrollr/src/skrollr.js'
+      'vendor/iscroll/build/iscroll.js'
     ],
     css: [
     ],

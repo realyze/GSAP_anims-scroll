@@ -10,6 +10,9 @@
     "angular-ui-utils": "~0.0.3"
   },
   "dependencies": {
-    "iscroll": "https://github.com/cubiq/iscroll/archive/v4.zip"
+    "skrollr": "https://github.com/Prinzhorn/skrollr/archive/0.6.17.zip",
+    "iscroll": "https://github.com/cubiq/iscroll/archive/v5.0.5.zip",
+    "underscore": "~1.5.2",
+    "jquery-nicescroll": "*"
   }
 }
