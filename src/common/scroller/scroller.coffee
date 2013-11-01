@@ -1,6 +1,6 @@
 # coffeelint: disable=max_line_length
 
-angular.module('salsita.scroller', [])
+angular.module('salsita.scroller2', [])
 
 .directive 'scroller', ($timeout) ->
   restrict: 'A'

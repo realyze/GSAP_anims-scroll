@@ -1,6 +1,6 @@
 # coffeelint: disable=max_line_length
 
-angular.module( 'ngBoilerplate', [
+angular.module( 'salsitasoft', [
   'templates-app'
   'templates-common'
   'ngBoilerplate.home'
@@ -9,7 +9,7 @@ angular.module( 'ngBoilerplate', [
   'ui.router'
   #'ui.state'
 
-  'salsita.gsap-scroller'
+  'scrollTest'
 ])
 
 .value('$anchorScroll', angular.noop)
@@ -33,7 +33,18 @@ angular.module( 'ngBoilerplate', [
   $urlRouterProvider.otherwise '/page1'
 
 
-.controller 'AppCtrl', ( $scope, $location, skrollrCenter, pageLoader ) ->
-  skrollrCenter.init()
-  pageLoader.init()
+.controller 'AppCtrl', ( $scope, $location, scrollAnimation ) ->
+  cubic = (p) -> Math.pow p, 3
+  tween = TweenLite.to $('.container:eq(2)'), 1, {opacity: 0.5}#, ease: (p) -> Math.pow p, 1.5}
+  tween2 = TweenLite.to $('.flipshit'), 1, {
+    x: -1 * $('.body-wrapper').width()/3
+  }
+  tween3 = TweenLite.to $('.rotateshit'), 1, {
+    color: '#FF0000'
+    rotation: 90
+    ease: cubic
+  }
 
+  scrollAnimation.registerAnimation tween, $('.body-wrapper'), $('.container:eq(2)')
+  scrollAnimation.registerAnimation tween2, $('.body-wrapper'), $('.container:eq(2)')
+  scrollAnimation.registerAnimation tween3, $('.body-wrapper'), $('.container:eq(2)')

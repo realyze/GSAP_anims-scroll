@@ -1,117 +1,90 @@
 # coffeelint: disable=max_line_length
 
+angular.module('scrollTest', [])
 
-toggleDirection = (tl) ->
-  if tl.reversed()
-    console.log 'reversed'
-    tl.play()
-  else
-    console.log 'play'
-    tl.reverse()
 
-SCROLL_THROTTLE_MS = 50
-TWEEN_LENGTH = 1000
-
-angular.module('salsita.gsap-scroller', [])
-
-.directive 'gsapScroller', ($timeout) ->
+.directive 'scrollerTest', ->
   restrict: 'A'
   link: (scope, element, attrs, ctrl) ->
+    console.log 'afgdsfsg'
+    gazastrip = {}
 
-    started = false
-    scrollTimeout = null
+    gazastrip.blockHeight = $(window).outerHeight()
+    gazastrip.blockWidth = $(window).outerWidth()
 
+    console.log gazastrip
 
-    #TweenLite.set('#content', {perspective:500})
+    $(".container").css({
+      height: gazastrip.blockHeight
+    })
 
-    tl = new TimelineMax({onComplete: -> console.log 'tween done'})
-    tl.to("#content", TWEEN_LENGTH/1000, {'opacity': 0, ease: Power1.easeOut})
-    tl.pause()
+    $(".view-wrapper").css({
+      width: 3*gazastrip.blockWidth
+    })
 
+    $(".view").css({
+      width: gazastrip.blockWidth
+    })
 
-    handleScrollEnd = ->
-      window.clearInterval scrollTimeout
-      scrollTimeout = null
-      tl.pause()
-      console.log 'end'
+    $(".body-wrapper").niceScroll({
+      touchbehavior: true,
+      overflowx:false,
+    })
 
-
-    handleScrollStart = () ->
-      scrollTimeout = scrollTimeout or (setInterval ->
-        tl.pause()
-        data = getScrollData $('#content'), $('#skroll')
-        if not data then return
-
-        [totalTime, down] = data
-
-        if totalTime
-          tl.timeScale TWEEN_LENGTH/totalTime
-          if not down
-            tl.reverse()
-          else
-            tl.play()
-          tl.resume()
-      , SCROLL_THROTTLE_MS)
+    $(".iscroll-2").niceScroll({
+      touchbehavior:true,
+      oneaxismousemode: false,
+      overflowy: false,
+    })
 
 
-    $timeout ->
-      myScroll = new IScroll('#skroll', { scrollX: true, freeScroll: true })
+.service 'scrollAnimation', ->
+  console.log 'scrollAnimation service'
 
-      myScroll.on 'scrollStart', ->
-        if started
-          started = false
-          handleScrollEnd()
-          return
-        started = true
-        handleScrollStart()
+  THROTTLE_MS = 25
 
-      myScroll.on 'scrollEnd', ->
-        if not started
-          return
-        started = false
-        handleScrollEnd()
+  registerAnimation: (anim, scrollTarget, scrollRefElement, opts) ->
+    anim.pause()
 
-      console.log 'elems', $('#content'), $('#skroll')
-    10
+    console.log anim
 
-    return
+    $scrollTarget = $(scrollTarget)
 
+    lastOffset = null
+    to = null
 
-lastOffsetPerc = 0
-lastCenterOffset = null
+    $scrollTarget.on 'scroll', ->
+      clearTimeout to
+      to = setTimeout ->
+        console.log 'scroll stop'
+        anim.pause()
+      , 100
+      handleScroll()
 
+    handleScroll = _.throttle ->
+      anim.pause()
 
-getScrollData = do ->
-  (el, scrollBody) ->
-    #console.log 'el offset top', $(el).offset().top - scrollBody.offset().top
+      offset = Math.abs($scrollTarget.offset().top - scrollRefElement.offset().top)/$scrollTarget.height()
+      offset = Math.min offset, 1
 
-    scrollingDown = null
+      if lastOffset is null or offset == 1
+        lastOffset = offset
+        return
 
-    elTop = el.offset().top - scrollBody.offset().top
+      coef = Math.abs(lastOffset - offset) / (THROTTLE_MS/1000) /1.5
 
-    offsetPerc = (elTop / ($(el).height() - $(scrollBody).height())) * 100
-    change = Math.abs(lastOffsetPerc - offsetPerc)
-    scrollingDown = lastOffsetPerc > offsetPerc
-    lastOffsetPerc = offsetPerc
+      ###if Math.abs((1 - offset) - anim._time/anim._totalDuration) > 0.3
+        console.log 'aaa'
+        coef = coef * 1.2###
 
-    console.log 'change', change, offsetPerc
+      anim.timeScale coef
+      if lastOffset - offset < 0
+        anim.reverse()
+      else
+        anim.play()
+      anim.resume()
 
-    if change == 0
-      return null
+      lastOffset = offset
 
-    if offsetPerc > 100
-      return null
-
-    #if offsetPerc < 10
-    #  return [10/offsetPerc, scrollingDown]
-
-    #if lastCenterOffset is null
-    #  lastCenterOffset = topOffset
-    #  return
-
-    totalTime = 100/change * SCROLL_THROTTLE_MS
-
-    #console.log 'total comnpute', totalTime
-
-    return [totalTime, scrollingDown]
-
+      #anim.seek offset
+    , THROTTLE_MS
