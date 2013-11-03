@@ -35,7 +35,7 @@ angular.module( 'salsitasoft', [
 
 .controller 'AppCtrl', ( $scope, $location, scrollAnimation ) ->
   cubic = (p) -> Math.pow p, 3
-  tween = TweenLite.to $('.container:eq(2)'), 1, {opacity: 0.5}#, ease: (p) -> Math.pow p, 1.5}
+  tween = TweenLite.to $('.container:eq(2)'), 1, {opacity: 1}#, ease: (p) -> Math.pow p, 1.5}
   tween2 = TweenLite.to $('.flipshit'), 1, {
     x: -1 * $('.body-wrapper').width()/3
   }
@@ -44,7 +44,12 @@ angular.module( 'salsitasoft', [
     rotation: 90
     ease: cubic
   }
+  tween4 = TweenLite.to $('.rot-shit'), 1, {
+    #scaleY: 5
+    #scaleX: -0.5
+  }
 
   scrollAnimation.registerAnimation tween, $('.body-wrapper'), $('.container:eq(2)')
   scrollAnimation.registerAnimation tween2, $('.body-wrapper'), $('.container:eq(2)')
   scrollAnimation.registerAnimation tween3, $('.body-wrapper'), $('.container:eq(2)')
+  scrollAnimation.registerAnimation tween4, $('.body-wrapper'), $('.container:eq(3)')

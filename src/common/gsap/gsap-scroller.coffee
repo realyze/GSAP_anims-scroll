@@ -41,16 +41,19 @@ angular.module('scrollTest', [])
 .service 'scrollAnimation', ->
   console.log 'scrollAnimation service'
 
-  THROTTLE_MS = 25
+  THROTTLE_MS = 30
 
-  registerAnimation: (anim, scrollTarget, scrollRefElement, opts) ->
+  registerAnimation: (anim, scrollTarget, scrollRefElement, opts) -> _.defer ->
     anim.pause()
 
     console.log anim
 
     $scrollTarget = $(scrollTarget)
 
-    lastOffset = null
+    offset = Math.abs($scrollTarget.offset().top - scrollRefElement.offset().top)/$scrollTarget.height()
+    offset = Math.min offset, 1
+
+    lastOffset = offset
     to = null
 
     $scrollTarget.on 'scroll', ->
@@ -62,20 +65,33 @@ angular.module('scrollTest', [])
       handleScroll()
 
     handleScroll = _.throttle ->
-      anim.pause()
 
       offset = Math.abs($scrollTarget.offset().top - scrollRefElement.offset().top)/$scrollTarget.height()
       offset = Math.min offset, 1
 
-      if lastOffset is null or offset == 1
+      if offset == 1
+        if lastOffset != 1
+          anim.seek(0)
         lastOffset = offset
         return
 
-      coef = Math.abs(lastOffset - offset) / (THROTTLE_MS/1000) /1.5
+      anim.pause()
 
-      ###if Math.abs((1 - offset) - anim._time/anim._totalDuration) > 0.3
-        console.log 'aaa'
-        coef = coef * 1.2###
+      timeProgress = anim._time/anim._totalDuration
+
+      coef = Math.abs(lastOffset - offset) / (THROTTLE_MS/1000)
+      if timeProgress > (1 - offset) * 1.1
+        coef = coef / 2
+      if timeProgress < (1 - offset) * 0.9
+        if offset < 0.15 or offset > 0.85
+          factor = 6
+        else
+          factor = 2
+        if lastOffset - offset < 0
+          # Animation is running back, so we need to slow down.
+          coef = coef / factor
+        else
+          coef = coef * factor
 
       anim.timeScale coef
       if lastOffset - offset < 0
@@ -83,6 +99,8 @@ angular.module('scrollTest', [])
       else
         anim.play()
       anim.resume()
+
+      console.log 'progress', offset.toFixed(3), anim._time.toFixed(3)
 
       lastOffset = offset
 
