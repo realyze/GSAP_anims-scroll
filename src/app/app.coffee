@@ -45,8 +45,8 @@ angular.module( 'salsitasoft', [
     ease: cubic
   }
   tween4 = TweenLite.to $('.rot-shit'), 1, {
-    #scaleY: 5
-    #scaleX: -0.5
+    scaleY: 5
+    scaleX: -0.5
   }
 
   scrollAnimation.registerAnimation tween, $('.body-wrapper'), $('.container:eq(2)')

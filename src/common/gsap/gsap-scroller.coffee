@@ -81,17 +81,16 @@ angular.module('scrollTest', [])
 
       coef = Math.abs(lastOffset - offset) / (THROTTLE_MS/1000)
       if timeProgress > (1 - offset) * 1.1
-        coef = coef / 2
-      if timeProgress < (1 - offset) * 0.9
-        if offset < 0.15 or offset > 0.85
-          factor = 6
+        if lastOffset - offset < 0
+          coef = coef * 2
         else
-          factor = 2
+          coef = coef / 2
+      if timeProgress < (1 - offset) * 0.9
         if lastOffset - offset < 0
           # Animation is running back, so we need to slow down.
-          coef = coef / factor
+          coef = coef / 2
         else
-          coef = coef * factor
+          coef = coef * 2
 
       anim.timeScale coef
       if lastOffset - offset < 0
